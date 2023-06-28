@@ -21,10 +21,10 @@ import cv2
 # Construcción de los argumentos pasados por teclado al momento de inicializar el programa
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-# ap.add_argument("-p", "--prototxt", required=True,
-# 	help="path to Caffe 'deploy' prototxt file")
-# ap.add_argument("-m", "--model", required=True,
-# 	help="path to Caffe pre-trained model")
+ap.add_argument("-p", "--prototxt", required=True,
+	help="path to Caffe 'deploy' prototxt file")
+ap.add_argument("-m", "--model", required=True,
+	help="path to Caffe pre-trained model")
 ap.add_argument("-i", "--input", type=str,
 	help="path to optional input video file")
 ap.add_argument("-o", "--output", type=str,
@@ -36,37 +36,20 @@ ap.add_argument("-s", "--skip-frames", type=int, default=30,
 args = vars(ap.parse_args())
 
 
-# Load names of classes
-classesFile = "coco.names"
-classes = None
-with open(classesFile, 'rt') as f:
-    classes = f.read().rstrip('\n').split('\n')
+# Inicializo una lista con las etiquetas de todas las clases con que se entrenó
+# el modelo inicial MobilNet SSD
 
-# Give the configuration and weight files for the model and load the network using them.
-modelConfiguration = "yolov3.cfg"
-modelWeights = "yolov3.weights"
+# initialize the list of class labels MobileNet SSD was trained to
+# detect
+CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
+	"bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+	"dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+	"sofa", "train", "tvmonitor"]
 
+# cargamos el modelo, en este caso un singleshot SSD
 # load our serialized model from disk
 print("[INFO] loading model...")
-net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
-net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-net.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL)
-
-
-# # Inicializo una lista con las etiquetas de todas las clases con que se entrenó
-# # el modelo inicial MobilNet SSD
-#
-# # initialize the list of class labels MobileNet SSD was trained to
-# # detect
-# CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-# 	"bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-# 	"dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-# 	"sofa", "train", "tvmonitor"]
-#
-# # cargamos el modelo, en este caso un singleshot SSD
-# # load our serialized model from disk
-# print("[INFO] loading model...")
-# net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 
 # Si no pasamos un video como argumento, toma la ip de la camara
 # if a video path was not supplied, grab a reference to the webcam
@@ -169,9 +152,9 @@ while True:
 				# detections list
 				idx = int(detections[0, 0, i, 1])
 
-				# # if the class label is not a person, ignore it
-				# if CLASSES[idx] != "person":
-				# 	continue
+				# if the class label is not a person, ignore it
+				if CLASSES[idx] != "person":
+					continue
 
 				# compute the (x, y)-coordinates of the bounding box
 				# for the object
