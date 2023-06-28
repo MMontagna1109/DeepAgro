@@ -3,8 +3,11 @@
 Las librerias necesarias para el funcionamiento son:
 
 NumPy
+
 OpenCV
+
 dlib
+
 imutils
 
 Se utilizan las técnicas de Object Detection y Object Tracking
